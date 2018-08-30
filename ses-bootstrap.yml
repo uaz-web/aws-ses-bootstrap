@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This stack sets up SQS queues and SNS topics for SES
+
+#===============================================================================
+# Begin Parameters section
+#===============================================================================
+# Parameters:
+#
+
+
+#===============================================================================
+# Begin Resources Section
+#===============================================================================
+Resources:
+
+#===============================================================================
+# SQS Queues
+#===============================================================================
+    sesBouncesQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        MessageRetentionPeriod: 1209600
+
+    sesComplaintsQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        MessageRetentionPeriod: 1209600
+
+#===============================================================================
+# SNS Topics
+#===============================================================================
+    sesBouncesTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        Subscription:
+          -
+            Endpoint: !GetAtt sesBouncesQueue.Arn
+            Protocol: "sqs"
+
+    sesComplaintsTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        Subscription:
+          -
+            Endpoint: !GetAtt sesComplaintsQueue.Arn
+            Protocol: "sqs"
+
+    sesAlarmTopic:
+      Type: "AWS::SNS::Topic"
+
+#===============================================================================
+# Begin Outputs section
+#===============================================================================
+Outputs:
+
+    sesBouncesTopic:
+      Value: !Ref sesBouncesTopic
+      Export:
+        Name: "ses-bounces-topic"
+
+    sesComplaintsTopic:
+      Value: !Ref sesComplaintsTopic
+      Export:
+        Name: "ses-complaints-topic"
+
+    sesAlarmTopic:
+      Value: !Ref sesAlarmTopic
+      Export:
+        Name: "ses-alarm-topic"
+
+    sesBouncesQueue:
+      Value: !Ref sesBouncesQueue
+      Export:
+        Name: "ses-bounces-queue"
+
+    sesComplaintsQueue:
+      Value: !Ref sesComplaintsQueue
+      Export:
+        Name: "ses-complaints-queue"
