@@ -1,5 +1,10 @@
+#===============================================================================
+# This CloudFormation template sets up SNS topics, SQS queues, and CloudWatch
+# alarms to monitor and collect bounces and complaints.
+#===============================================================================
+
 AWSTemplateFormatVersion: "2010-09-09"
-Description: This stack sets up SQS queues and SNS topics for SES
+Description: SES Monitoring and Alarm Resources
 
 #===============================================================================
 # Begin Resources Section
