@@ -2,13 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: This stack sets up SQS queues and SNS topics for SES
 
 #===============================================================================
-# Begin Parameters section
-#===============================================================================
-# Parameters:
-#
-
-
-#===============================================================================
 # Begin Resources Section
 #===============================================================================
 Resources:
@@ -47,6 +40,65 @@ Resources:
 
     sesAlarmTopic:
       Type: "AWS::SNS::Topic"
+
+#===============================================================================
+# CloudWatch Alarms
+#===============================================================================
+    sesBouncesReputationAlarm:
+      Type: "AWS::CloudWatch::Alarm"
+      Properties:
+        AlarmDescription: "Alarm to monitor bounce reputation"
+        AlarmActions:
+          - !Ref sesAlarmTopic
+        MetricName: Reputation.BounceRate
+        Namespace: AWS/SES
+        Statistic: Average
+        Period: "21600"
+        EvaluationPeriods: "1"
+        Threshold: "0.05"
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+
+    sesComplaintsReputationAlarm:
+      Type: "AWS::CloudWatch::Alarm"
+      Properties:
+        AlarmDescription: "Alarm to monitor complaint reputation"
+        AlarmActions:
+          - !Ref sesAlarmTopic
+        MetricName: Reputation.ComplaintRate
+        Namespace: AWS/SES
+        Statistic: Average
+        Period: "21600"
+        EvaluationPeriods: "1"
+        Threshold: "0.001"
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+
+    sesBouncesAlarm:
+      Type: "AWS::CloudWatch::Alarm"
+      Properties:
+        AlarmDescription: "Alarm to monitor exessive bounces"
+        AlarmActions:
+          - !Ref sesAlarmTopic
+        MetricName: Bounce
+        Namespace: AWS/SES
+        Statistic: Sum
+        Period: "3600"
+        EvaluationPeriods: "1"
+        Threshold: "5"
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+
+    sesComplaintsAlarm:
+      Type: "AWS::CloudWatch::Alarm"
+      Properties:
+        AlarmDescription: "Alarm to monitor complaints"
+        AlarmActions:
+          - !Ref sesAlarmTopic
+        MetricName: Complaint
+        Namespace: AWS/SES
+        Statistic: Sum
+        Period: "86400"
+        EvaluationPeriods: "1"
+        Threshold: "1"
+        ComparisonOperator: GreaterThanOrEqualToThreshold
 
 #===============================================================================
 # Begin Outputs section
