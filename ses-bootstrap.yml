@@ -12,6 +12,68 @@ Description: SES Monitoring and Alarm Resources
 Resources:
 
 #===============================================================================
+# IAM
+#===============================================================================
+    sesSendGroup:
+      Type: 'AWS::IAM::Group'
+      Properties:
+        GroupName: !Sub "${AWS::StackName}-send-group"
+
+    sesSendPolicy:
+      Type: 'AWS::IAM::Policy'
+      Properties:
+        PolicyName: !Sub "${AWS::StackName}-send-policy"
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ses:SendEmail'
+                - 'ses:SendRawEmail'
+              Resource: '*'
+              Condition:
+                ForAllValues:StringNotLike:
+                  ses:Recipients:
+                    - '*@example.com'
+                    - 'noreply@*'
+        Groups:
+          - !Ref sesSendGroup
+
+
+#===============================================================================
+# SES Configuration Set
+#===============================================================================
+    sesConfigSet:
+      Type: AWS::SES::ConfigurationSet
+      Properties:
+        Name: !Sub "${AWS::StackName}-config-set"
+
+    sesEventDestination:
+      Type: AWS::SES::ConfigurationSetEventDestination
+      Properties:
+        ConfigurationSetName: !Ref sesConfigSet
+        EventDestination:
+          Name: !Sub "${AWS::StackName}-event-destination"
+          Enabled: true
+          MatchingEventTypes:
+            - send
+            - reject
+            - delivery
+            - bounce
+            - complaint
+          CloudWatchDestination:
+            DimensionConfigurations:
+              - DimensionName: ses:caller-identity
+                DimensionValueSource: messageTag
+                DefaultDimensionValue: none
+              - DimensionName: ID
+                DimensionValueSource: messageTag
+                DefaultDimensionValue: none
+              - DimensionName: Sender
+                DimensionValueSource: emailHeader
+                DefaultDimensionValue: none
+
+#===============================================================================
 # SQS Queues
 #===============================================================================
     sesBouncesQueue:
