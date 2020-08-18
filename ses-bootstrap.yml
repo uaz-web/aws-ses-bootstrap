@@ -36,6 +36,9 @@ Resources:
                   ses:Recipients:
                     - '*@example.com'
                     - 'noreply@*'
+                    - 'no-reply@*'
+                    - 'no_reply@*'
+                    - 'no.reply@*'
         Groups:
           - !Ref sesSendGroup
 

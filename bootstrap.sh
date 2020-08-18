@@ -7,5 +7,6 @@ aws sesv2 put-account-suppression-attributes \
   --suppressed-reasons BOUNCE COMPLAINT
 
 aws cloudformation deploy \
-  --template-file ses-bootstrap.yml
-  --stack-name "${SES_STACK_NAME}"
+  --template-file ses-bootstrap.yml \
+  --stack-name "${SES_STACK_NAME}" \
+  --capabilities CAPABILITY_NAMED_IAM
